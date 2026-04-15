@@ -1,0 +1,20 @@
+node_modules/
+dist/
+build/
+.turbo/
+.vite/
+.cache/
+coverage/
+*.log
+.env
+.env.*
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Generated reports or exports
+docs/report/*.pdf
+docs/assets/generated/
