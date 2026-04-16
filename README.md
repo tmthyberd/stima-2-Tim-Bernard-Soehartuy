@@ -5,19 +5,19 @@ React + TypeScript di frontend dan Rust di backend.
 ## Struktur Proyek
 
 ```text
-.
-|-- frontend/
-|   |-- public/
-|   `-- src/
-|-- backend/
-|   |-- src/
-|   `-- tests/
-|-- contracts/
-|-- docs/
-|-- infra/
-|-- samples/
-|-- scripts/
-`-- .gitignore
+    .
+    |-- frontend/
+    |   |-- public/
+    |   `-- src/
+    |-- backend/
+    |   |-- src/
+    |   `-- tests/
+    |-- contracts/
+    |-- docs/
+    |-- infra/
+    |-- samples/
+    |-- scripts/
+    `-- .gitignore
 ```
 
 ## Pembagian fungsi
