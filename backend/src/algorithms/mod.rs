@@ -2,7 +2,7 @@ use crate::models::DomTree;
 use crate::selectors::{matches_selector, parse_selector, Selector};
 use std::collections::VecDeque;
 pub struct SearchResult {
-    pub found_indices: Vec<usize>, // Sekarang isinya angka index, bukan bool
+    pub found_indices: Vec<usize>,
     pub traversal_log: Vec<usize>,
 }
 
