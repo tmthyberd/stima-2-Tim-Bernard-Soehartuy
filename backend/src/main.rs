@@ -1,32 +1,27 @@
-
+mod algorithms;
 mod models;
 mod parser;
+mod routes;
 mod scraper;
-mod algorithms;
-
-
-use axum::{routing::get, Router};
+mod selectors;
+use crate::routes::{handle_parse, handle_scrape, handle_search};
+use axum::{routing::post, Router};
+use std::net::SocketAddr;
 use tower_http::cors::CorsLayer;
-
 
 #[tokio::main]
 async fn main() {
-
     let app = Router::new()
-        .route("/health", get(health_check)) 
-        .layer(CorsLayer::permissive());     
+        .route("/api/parse", post(handle_parse))
+        .route("/api/scrape", post(handle_scrape))
+        .route("/api/search", post(handle_search));
 
-    // Tentukan alamat server: localhost port 8080
-    let listener = tokio::net::TcpListener::bind("0.0.0.0:8080")
-        .await
-        .unwrap();
+    let listener = tokio::net::TcpListener::bind("0.0.0.0:8080").await.unwrap();
 
     println!("Server berjalan di http://localhost:8080");
 
-
     axum::serve(listener, app).await.unwrap();
 }
-
 
 async fn health_check() -> &'static str {
     r#"{"status": "ok"}"#
