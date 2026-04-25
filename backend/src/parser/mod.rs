@@ -3,8 +3,8 @@ use std::collections::HashMap;
 use crate::models::{DomNode, DomTree, NodeType};
 
 pub enum Token {
-    OpenTag(String, HashMap<String, String>),
-    CloseTag(String),
+    OpenTag(String, HashMap<String, String>), // <div class="apakek"> -> "div", "class", "apakek"
+    CloseTag(String),                         // </div>
     Text(String),
 }
 
@@ -36,6 +36,7 @@ pub fn tokenize(html: &str) -> Vec<Token> {
                     chars.next(); // Buang '/'
                     let mut tag_name = String::new();
                     while let Some(&next_c) = chars.peek() {
+                        //d i v
                         if next_c == '>' {
                             break;
                         }
@@ -76,7 +77,23 @@ pub fn tokenize(html: &str) -> Vec<Token> {
 }
 
 fn is_void_element(tag: &str) -> bool {
-    matches!(tag, "area" | "base" | "br" | "col" | "embed" | "hr" | "img" | "input" | "link" | "meta" | "source" | "track" | "wbr" | "!doctype")
+    matches!(
+        tag,
+        "area"
+            | "base"
+            | "br"
+            | "col"
+            | "embed"
+            | "hr"
+            | "img"
+            | "input"
+            | "link"
+            | "meta"
+            | "source"
+            | "track"
+            | "wbr"
+            | "!doctype"
+    )
 }
 
 pub fn parse(html: &str) -> DomTree {
@@ -90,7 +107,10 @@ pub fn parse(html: &str) -> DomTree {
         match token {
             Token::OpenTag(name, attrs) => {
                 let lower_name = name.to_lowercase();
-                let is_ignored_container = matches!(lower_name.as_str(), "head" | "style" | "script" | "title" | "noscript" | "svg");
+                let is_ignored_container = matches!(
+                    lower_name.as_str(),
+                    "head" | "style" | "script" | "title" | "noscript" | "svg"
+                );
                 let is_ignored_void = matches!(lower_name.as_str(), "meta" | "link" | "!doctype");
 
                 if ignore_depth > 0 {
@@ -143,7 +163,7 @@ pub fn parse(html: &str) -> DomTree {
             }
             Token::CloseTag(name) => {
                 let lower_name = name.to_lowercase();
-                
+
                 if is_void_element(&lower_name) {
                     continue;
                 }
