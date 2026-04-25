@@ -18,3 +18,9 @@ Thumbs.db
 # Generated reports or exports
 docs/report/*.pdf
 docs/assets/generated/
+docs/generated/
+docs/bfs_dfs_comparison.docx
+
+# Local benchmark/report helpers
+backend/examples/compare_bfs_dfs.rs
+scripts/generate_bfs_dfs_report.py
