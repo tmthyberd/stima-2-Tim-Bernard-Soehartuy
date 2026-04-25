@@ -6,7 +6,6 @@ mod scraper;
 mod selectors;
 use crate::routes::{handle_parse, handle_scrape, handle_search};
 use axum::{routing::post, Router};
-use std::net::SocketAddr;
 use tower_http::cors::CorsLayer;
 
 #[tokio::main]
@@ -22,8 +21,4 @@ async fn main() {
     println!("Server berjalan di http://localhost:8080");
 
     axum::serve(listener, app).await.unwrap();
-}
-
-async fn health_check() -> &'static str {
-    r#"{"status": "ok"}"#
 }
