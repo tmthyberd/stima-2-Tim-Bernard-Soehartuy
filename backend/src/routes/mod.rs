@@ -69,7 +69,12 @@ pub async fn handle_search(
                 error: "Algoritma tidak valid! Gunakan 'bfs' atau 'dfs'.".to_string(),
             }));
         }
-    };
+    }
+    .map_err(|error| {
+        Json(ErrorResponse {
+            error: format!("Selector tidak valid: {}", error),
+        })
+    })?;
 
     Ok(Json(SearchResponse {
         found_indices: search_result.found_indices,

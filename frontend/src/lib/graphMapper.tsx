@@ -2,9 +2,6 @@ import dagre from 'dagre';
 import { Node, Edge, Handle, Position, NodeProps } from '@xyflow/react';
 import { DomTree } from '../types';
 
-const dagreGraph = new dagre.graphlib.Graph();
-dagreGraph.setDefaultEdgeLabel(() => ({}));
-
 const nodeWidth = 160;
 const nodeHeight = 90;
 
@@ -63,6 +60,9 @@ export const edgeOptions = {
 };
 
 export const getLayoutedElements = (nodes: Node[], edges: Edge[], direction = 'TB') => {
+    const dagreGraph = new dagre.graphlib.Graph();
+    dagreGraph.setDefaultEdgeLabel(() => ({}));
+
     const isHorizontal = direction === 'LR';
     dagreGraph.setGraph({ 
         rankdir: direction,

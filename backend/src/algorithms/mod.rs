@@ -6,13 +6,13 @@ pub struct SearchResult {
     pub traversal_log: Vec<usize>,
 }
 
-pub fn bfs(tree: &DomTree, selector_str: &str, top_n: usize) -> SearchResult {
+pub fn bfs(tree: &DomTree, selector_str: &str, top_n: usize) -> Result<SearchResult, String> {
     let mut result = SearchResult {
         found_indices: Vec::new(),
         traversal_log: Vec::new(),
     };
 
-    let selector = parse_selector(selector_str);
+    let selector = parse_selector(selector_str)?;
 
     let mut queue: VecDeque<usize> = VecDeque::new();
     let mut visited = vec![false; tree.nodes.len()];
@@ -23,7 +23,7 @@ pub fn bfs(tree: &DomTree, selector_str: &str, top_n: usize) -> SearchResult {
     while let Some(curr) = queue.pop_front() {
         result.traversal_log.push(curr);
 
-        if matches_selector(&tree.nodes[curr], &selector) {
+        if matches_selector(tree, curr, &selector) {
             result.found_indices.push(curr);
             if top_n > 0 && result.found_indices.len() >= top_n {
                 break;
@@ -38,26 +38,32 @@ pub fn bfs(tree: &DomTree, selector_str: &str, top_n: usize) -> SearchResult {
         }
     }
 
-    result
+    Ok(result)
 }
 
-pub fn dfs(tree: &DomTree, selector_str: &str, top_n: usize) -> SearchResult {
+pub fn dfs(tree: &DomTree, selector_str: &str, top_n: usize) -> Result<SearchResult, String> {
     let mut result = SearchResult {
         found_indices: Vec::new(),
         traversal_log: Vec::new(),
     };
 
-    let selector = parse_selector(selector_str);
+    let selector = parse_selector(selector_str)?;
 
     dfs_helper(0, tree, &selector, &mut result, top_n);
 
-    result
+    Ok(result)
 }
 
-fn dfs_helper(curr: usize, tree: &DomTree, selector: &Selector, result: &mut SearchResult, top_n: usize) -> bool {
+fn dfs_helper(
+    curr: usize,
+    tree: &DomTree,
+    selector: &Selector,
+    result: &mut SearchResult,
+    top_n: usize,
+) -> bool {
     result.traversal_log.push(curr);
 
-    if matches_selector(&tree.nodes[curr], selector) {
+    if matches_selector(tree, curr, selector) {
         result.found_indices.push(curr);
         if top_n > 0 && result.found_indices.len() >= top_n {
             return true;
@@ -77,41 +83,57 @@ fn test_bfs() {
 
     let html = r#"<html><body><div><p>Satu</p><p>Dua</p></div></body></html>"#;
     let tree = parse(html);
-    let result = bfs(&tree, "p", 0);
+    let result = bfs(&tree, "p", 0).unwrap();
 
     println!("Traversal log: {:?}", result.traversal_log);
     println!("Found at: {:?}", result.found_indices);
 
     assert_eq!(result.found_indices.len(), 2);
 }
-//#[test]
-//fn test_dfs() {
-//    use crate::parser::parse;
-//
-//    let html = r#"<html><body><div><p>Satu</p><p>Dua</p></div></body></html>"#;
-//    let tree = parse(html);
-//    let result = dfs(&tree, "p", 0);
-//
-//    println!("Traversal log: {:?}", result.traversal_log);
-//    println!("Found at: {:?}", result.found_indices);
-//
-//    assert_eq!(result.found_indices.len(), 2);
-//}
-//
-//#[test]
-//fn test_selector_class_dan_id() {
-//    use crate::parser::parse;
-//
-//    let html = r#"<html><body><div class="box"><p id="judul">Halo</p></div></body></html>"#;
-//    let tree = parse(html);
-//
-//    // Test class selector
-//    let result_class = bfs(&tree, ".box", 0);
-//    println!("Class '.box' found at: {:?}", result_class.found_indices);
-//    assert_eq!(result_class.found_indices.len(), 1);
-//
-//    // Test id selector
-//    let result_id = dfs(&tree, "#judul", 0);
-//    println!("Id '#judul' found at: {:?}", result_id.found_indices);
-//    assert_eq!(result_id.found_indices.len(), 1);
-//}
+
+#[test]
+fn test_combinator_selectors() {
+    use crate::parser::parse;
+
+    let html = r#"
+        <html>
+            <body>
+                <main>
+                    <section class="card"><p id="inside">Inside</p></section>
+                    <p id="after-section">After</p>
+                    <article><p id="nested">Nested</p></article>
+                    <h2>Title</h2>
+                    <p id="after-heading">Lead</p>
+                    <p id="last">Last</p>
+                </main>
+            </body>
+        </html>
+    "#;
+    let tree = parse(html);
+
+    assert_eq!(
+        ids_for(&tree, bfs(&tree, "main p", 0).unwrap()),
+        vec!["after-section", "after-heading", "last", "inside", "nested",]
+    );
+    assert_eq!(
+        ids_for(&tree, bfs(&tree, "main > p", 0).unwrap()),
+        vec!["after-section", "after-heading", "last"]
+    );
+    assert_eq!(
+        ids_for(&tree, bfs(&tree, "section + p", 0).unwrap()),
+        vec!["after-section"]
+    );
+    assert_eq!(
+        ids_for(&tree, bfs(&tree, "section ~ p", 0).unwrap()),
+        vec!["after-section", "after-heading", "last"]
+    );
+}
+
+#[cfg(test)]
+fn ids_for(tree: &DomTree, result: SearchResult) -> Vec<String> {
+    result
+        .found_indices
+        .iter()
+        .filter_map(|&index| tree.nodes[index].attributes.get("id").cloned())
+        .collect()
+}
