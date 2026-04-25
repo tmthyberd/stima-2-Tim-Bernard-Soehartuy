@@ -2,9 +2,9 @@ use serde::Serialize;
 use std::collections::HashMap;
 #[derive(Debug, Serialize)]
 pub enum NodeType {
-    Element,
-    Text,
-    Document,
+    Element,  // Tag HTML
+    Text,     // Konten Teks
+    Document, // Root dari Node Tree, Selalu berindex 0
 }
 #[derive(Debug, Serialize)]
 pub struct DomNode {

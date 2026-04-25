@@ -9,11 +9,12 @@ pub enum Token {
 }
 
 pub fn parse_open_tag(content: String) -> Token {
-    let parts: Vec<&str> = content.split_whitespace().collect();
+    // mengembalikan tag_name beserta map attributes
+    let parts: Vec<&str> = content.split_whitespace().collect(); // memisahkan kalimat menjadi kata-kata?
 
-    let tag_name = parts[0].to_string();
+    let tag_name = parts[0].to_string(); // kata pertama menjadi tag_name
 
-    let mut attributes = HashMap::new();
+    let mut attributes = HashMap::new(); // attribute dijadikan suatu hashmap antar string dengan string
 
     for attr in &parts[1..] {
         if let Some((key, val)) = attr.split_once('=') {
@@ -29,6 +30,7 @@ pub fn tokenize(html: &str) -> Vec<Token> {
     let mut chars = html.chars().peekable();
 
     while let Some(&c) = chars.peek() {
+        // kita liat dulu aja karakter yang sedang dibaca
         match c {
             '<' => {
                 chars.next(); // Buang '<'
