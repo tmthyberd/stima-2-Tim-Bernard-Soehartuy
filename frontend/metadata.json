@@ -1,0 +1,6 @@
+{
+    "name": "DOM Tree Visualizer",
+    "description": "Visualize DOM tree traversal using BFS and DFS algorithms with real-time highlighting.",
+    "requestFramePermissions": [],
+    "majorCapabilities": []
+}
