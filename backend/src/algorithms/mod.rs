@@ -6,7 +6,7 @@ pub struct SearchResult {
     pub traversal_log: Vec<usize>,
 }
 
-pub fn bfs(tree: &DomTree, selector_str: &str) -> SearchResult {
+pub fn bfs(tree: &DomTree, selector_str: &str, top_n: usize) -> SearchResult {
     let mut result = SearchResult {
         found_indices: Vec::new(),
         traversal_log: Vec::new(),
@@ -25,6 +25,9 @@ pub fn bfs(tree: &DomTree, selector_str: &str) -> SearchResult {
 
         if matches_selector(&tree.nodes[curr], &selector) {
             result.found_indices.push(curr);
+            if top_n > 0 && result.found_indices.len() >= top_n {
+                break;
+            }
         }
 
         for &child_index in &tree.nodes[curr].children {
@@ -38,7 +41,7 @@ pub fn bfs(tree: &DomTree, selector_str: &str) -> SearchResult {
     result
 }
 
-pub fn dfs(tree: &DomTree, selector_str: &str) -> SearchResult {
+pub fn dfs(tree: &DomTree, selector_str: &str, top_n: usize) -> SearchResult {
     let mut result = SearchResult {
         found_indices: Vec::new(),
         traversal_log: Vec::new(),
@@ -46,21 +49,27 @@ pub fn dfs(tree: &DomTree, selector_str: &str) -> SearchResult {
 
     let selector = parse_selector(selector_str);
 
-    dfs_helper(0, tree, &selector, &mut result);
+    dfs_helper(0, tree, &selector, &mut result, top_n);
 
     result
 }
 
-fn dfs_helper(curr: usize, tree: &DomTree, selector: &Selector, result: &mut SearchResult) {
+fn dfs_helper(curr: usize, tree: &DomTree, selector: &Selector, result: &mut SearchResult, top_n: usize) -> bool {
     result.traversal_log.push(curr);
 
     if matches_selector(&tree.nodes[curr], selector) {
         result.found_indices.push(curr);
+        if top_n > 0 && result.found_indices.len() >= top_n {
+            return true;
+        }
     }
 
     for &child_index in &tree.nodes[curr].children {
-        dfs_helper(child_index, tree, selector, result);
+        if dfs_helper(child_index, tree, selector, result, top_n) {
+            return true;
+        }
     }
+    false
 }
 #[test]
 fn test_bfs() {
@@ -68,7 +77,7 @@ fn test_bfs() {
 
     let html = r#"<html><body><div><p>Satu</p><p>Dua</p></div></body></html>"#;
     let tree = parse(html);
-    let result = bfs(&tree, "p");
+    let result = bfs(&tree, "p", 0);
 
     println!("Traversal log: {:?}", result.traversal_log);
     println!("Found at: {:?}", result.found_indices);
@@ -81,7 +90,7 @@ fn test_bfs() {
 //
 //    let html = r#"<html><body><div><p>Satu</p><p>Dua</p></div></body></html>"#;
 //    let tree = parse(html);
-//    let result = dfs(&tree, "p");
+//    let result = dfs(&tree, "p", 0);
 //
 //    println!("Traversal log: {:?}", result.traversal_log);
 //    println!("Found at: {:?}", result.found_indices);
@@ -97,12 +106,12 @@ fn test_bfs() {
 //    let tree = parse(html);
 //
 //    // Test class selector
-//    let result_class = bfs(&tree, ".box");
+//    let result_class = bfs(&tree, ".box", 0);
 //    println!("Class '.box' found at: {:?}", result_class.found_indices);
 //    assert_eq!(result_class.found_indices.len(), 1);
 //
 //    // Test id selector
-//    let result_id = dfs(&tree, "#judul");
+//    let result_id = dfs(&tree, "#judul", 0);
 //    println!("Id '#judul' found at: {:?}", result_id.found_indices);
 //    assert_eq!(result_id.found_indices.len(), 1);
 //}

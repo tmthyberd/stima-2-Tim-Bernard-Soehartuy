@@ -75,15 +75,40 @@ pub fn tokenize(html: &str) -> Vec<Token> {
     tokens
 }
 
+fn is_void_element(tag: &str) -> bool {
+    matches!(tag, "area" | "base" | "br" | "col" | "embed" | "hr" | "img" | "input" | "link" | "meta" | "source" | "track" | "wbr" | "!doctype")
+}
+
 pub fn parse(html: &str) -> DomTree {
     let tokens = tokenize(html);
     let mut tree = DomTree::new();
 
     let mut stack = vec![0];
+    let mut ignore_depth = 0;
 
     for token in tokens {
         match token {
             Token::OpenTag(name, attrs) => {
+                let lower_name = name.to_lowercase();
+                let is_ignored_container = matches!(lower_name.as_str(), "head" | "style" | "script" | "title" | "noscript" | "svg");
+                let is_ignored_void = matches!(lower_name.as_str(), "meta" | "link" | "!doctype");
+
+                if ignore_depth > 0 {
+                    if !is_void_element(&lower_name) {
+                        ignore_depth += 1;
+                    }
+                    continue;
+                }
+
+                if is_ignored_void {
+                    continue;
+                }
+
+                if is_ignored_container {
+                    ignore_depth = 1;
+                    continue;
+                }
+
                 let parent_index = *stack.last().unwrap();
 
                 let new_node = DomNode {
@@ -96,27 +121,38 @@ pub fn parse(html: &str) -> DomTree {
                 };
 
                 let new_index = tree.add_node(new_node);
-
                 tree.nodes[parent_index].children.push(new_index);
 
-                stack.push(new_index);
+                if !is_void_element(&lower_name) {
+                    stack.push(new_index);
+                }
             }
             Token::Text(content) => {
+                if ignore_depth > 0 {
+                    continue;
+                }
+
                 let parent_index = *stack.last().unwrap();
 
-                let text_node = DomNode {
-                    node_type: NodeType::Text,
-                    tag_name: None,
-                    attributes: HashMap::new(),
-                    children: Vec::new(),
-                    parent: Some(parent_index),
-                    text_content: Some(content),
-                };
-
-                let text_index = tree.add_node(text_node);
-                tree.nodes[parent_index].children.push(text_index);
+                if let Some(ref mut text) = tree.nodes[parent_index].text_content {
+                    text.push_str(" ");
+                    text.push_str(&content);
+                } else {
+                    tree.nodes[parent_index].text_content = Some(content);
+                }
             }
-            Token::CloseTag(_name) => {
+            Token::CloseTag(name) => {
+                let lower_name = name.to_lowercase();
+                
+                if is_void_element(&lower_name) {
+                    continue;
+                }
+
+                if ignore_depth > 0 {
+                    ignore_depth -= 1;
+                    continue;
+                }
+
                 if stack.len() > 1 {
                     stack.pop();
                 }

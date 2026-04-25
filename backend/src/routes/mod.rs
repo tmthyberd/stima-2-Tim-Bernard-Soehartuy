@@ -21,6 +21,7 @@ pub struct SearchRequest {
     pub html: String,
     pub selector: String,
     pub algorithm: String,
+    pub top_n: Option<usize>,
 }
 
 #[derive(Serialize)]
@@ -58,9 +59,11 @@ pub async fn handle_search(
 ) -> Result<Json<SearchResponse>, Json<ErrorResponse>> {
     let tree = parse(&payload.html);
 
+    let top_n = payload.top_n.unwrap_or(0);
+
     let search_result = match payload.algorithm.as_str() {
-        "bfs" => bfs(&tree, &payload.selector),
-        "dfs" => dfs(&tree, &payload.selector),
+        "bfs" => bfs(&tree, &payload.selector, top_n),
+        "dfs" => dfs(&tree, &payload.selector, top_n),
         _ => {
             return Err(Json(ErrorResponse {
                 error: "Algoritma tidak valid! Gunakan 'bfs' atau 'dfs'.".to_string(),

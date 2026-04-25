@@ -14,7 +14,8 @@ async fn main() {
     let app = Router::new()
         .route("/api/parse", post(handle_parse))
         .route("/api/scrape", post(handle_scrape))
-        .route("/api/search", post(handle_search));
+        .route("/api/search", post(handle_search))
+        .layer(CorsLayer::permissive());
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:8080").await.unwrap();
 
