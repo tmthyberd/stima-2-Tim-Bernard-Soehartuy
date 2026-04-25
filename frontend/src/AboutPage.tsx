@@ -49,7 +49,7 @@ export default function AboutPage() {
         <div className="w-full aspect-video bg-[#D6CFC1] border-2 border-[#4A453F] rounded-2xl overflow-hidden">
           <iframe
             className="w-full h-full"
-            src=""
+            src="https://www.youtube.com/embed/PUqg99S5ApU"
             title="Video Presentasi"
             frameBorder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
