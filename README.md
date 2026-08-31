@@ -1,110 +1,110 @@
-# Tubes 2 DOM Traversal
+# DOM Traversal Explorer
 
-Web application untuk mem-parsing HTML menjadi DOM tree dan mencari elemen menggunakan algoritma Breadth-First Search (BFS) dan Depth-First Search (DFS) berdasarkan CSS Selector. Proyek ini menggunakan backend berbasis Rust (Axum) dan frontend berbasis React (TypeScript/Vite).
+This is a small web app for exploring how HTML turns into a DOM tree, and how search algorithms move through that tree. You paste in some HTML (or give it a URL to fetch), type a CSS selector, and pick either BFS or DFS. The app parses the page, builds the tree, runs the chosen algorithm, and shows you the traversal step by step on an interactive graph.
 
-## Struktur Repositori
+It started as a university assignment (Strategi Algoritma) about applying BFS and DFS to a real, visual problem instead of a plain graph on paper.
 
-```text
+## How it works
+
+- The backend parses raw HTML into a DOM tree by hand (no external HTML parsing library) and implements its own CSS selector matching, supporting tags, classes, ids, the universal selector `*`, and combinators (` `, `>`, `+`, `~`).
+- Breadth-First Search walks the tree level by level using a queue.
+- Depth-First Search walks down each branch first, using recursion.
+- Both algorithms return which nodes matched the selector and the full order in which nodes were visited, so the frontend can animate the search.
+
+## Tech stack
+
+**Backend**
+- Rust
+- Axum (web framework)
+- Tokio (async runtime)
+- Reqwest (for fetching pages by URL)
+- Serde / serde_json (JSON handling)
+
+**Frontend**
+- React with TypeScript
+- Vite
+- React Router
+- @xyflow/react and dagre (for laying out and rendering the DOM tree as a graph)
+- Tailwind CSS
+
+**Other**
+- Docker and Docker Compose, for running everything with one command
+
+## Project structure
+
+```
 .
-├── backend/                  
+├── backend/
 │   ├── src/
-│   │   ├── algorithms/      
-│   │   ├── models/           
-│   │   ├── parser/          
-│   │   ├── routes/           
-│   │   ├── scraper/           
-│   │   ├── selectors/       
-│   │   └── main.rs           
-│   ├── Cargo.toml           
-│   └── Dockerfile           
-├── frontend/                 
-│   ├── src/                  
-│   ├── package.json          
-│   └── Dockerfile            
-├── docker-compose.yml        
-└── README.md
+│   │   ├── algorithms/    BFS and DFS implementations
+│   │   ├── models/        DOM tree and node data structures
+│   │   ├── parser/        HTML parser
+│   │   ├── routes/        API endpoints
+│   │   ├── scraper/       fetches HTML from a URL
+│   │   └── selectors/     CSS selector parsing and matching
+│   ├── Cargo.toml
+│   └── Dockerfile
+├── frontend/
+│   ├── src/
+│   ├── package.json
+│   └── Dockerfile
+└── docker-compose.yml
 ```
 
-## Implementasi Algoritma
+## Running it
 
-### Breadth-First Search (BFS)
-Pencarian node dilakukan secara melebar, menelusuri semua node pada satu kedalaman (level) terlebih dahulu sebelum berlanjut ke level berikutnya. Implementasinya menggunakan struktur data antrean (diimplementasikan dengan `VecDeque` pada Rust) agar simpul diproses sesuai urutan penemuan.
+You'll need Rust and Cargo (1.70 or newer) and Node.js (18 or newer) with npm. Or, if you'd rather skip installing all of that, just use Docker.
 
-### Depth-First Search (DFS)
-Pencarian node dilakukan secara mendalam, mengeksplorasi cabang pohon terjauh sebelum melakukan proses *backtracking* ke child lain dari simpul sebelumnya. Implementasinya pada program ini menggunakan pendekatan fungsi rekursif.
+### With Docker (easiest)
 
-## Requirement Sistem
+Make sure Docker is installed and running, then from the project root:
 
-1. **Rust dan Cargo** (versi minimum 1.70).
-2. **Node.js** (versi minimum 18) dan **npm**.
-
-## Instalasi dan Kompilasi
-
-Clone repositori ini dan navigasikan ke direktori utama proyek:
-
-```bash
-git clone https://github.com/tmthyberd/stima-2-Tim-Bernard-Soehartuy.git
-cd stima-2-Tim-Bernard-Soehartuy
-```
-
-### Backend (Rust)
-
-1. Pindah ke direktori backend:
-   ```bash
-   cd backend
-   ```
-2. Untuk menjalankan server dalam mode development:
-   ```bash
-   cargo run
-   ```
-3. Untuk melakukan build mode production:
-   ```bash
-   cargo build --release
-   ```
-   Binary yang dihasilkan dapat dieksekusi melalui `./target/release/backend`.
-   
-Server akan berjalan pada `http://localhost:8080`.
-
-### Frontend (React)
-
-1. Buka tab terminal baru dan pindah ke direktori frontend:
-   ```bash
-   cd frontend
-   ```
-2. Instal dependency paket:
-   ```bash
-   npm install
-   ```
-3. Jalankan server frontend:
-   ```bash
-   npm run dev
-   ```
-4. Untuk build aset secara production:
-   ```bash
-   npm run build
-   ```
-
-Aplikasi dapat diakses melalui browser pada alamat default `http://localhost:3000`.
-
-### Menjalankan dengan Docker
-
-Proyek ini terkonfigurasi untuk bisa berjalan dengan mudah melalui kontainer Docker. Pastikan sistem Anda memiliki Docker daemon dan plugin `docker compose`.
-
-Menyalakan service frontend dan backend di *background*:
 ```bash
 docker compose up -d --build
 ```
-Aplikasi web akan tersedia di `http://localhost:3000` dan backend berjalan otomatis di `http://localhost:8080`.
 
-Mematikan semua kontainer:
+The frontend will be available at `http://localhost:3000` and the backend at `http://localhost:8080`.
+
+To stop everything:
+
 ```bash
 docker compose down
 ```
 
-## Author
+### Running manually
 
-| Nama | NIM |
+Start the backend:
+
+```bash
+cd backend
+cargo run
+```
+
+This runs the server at `http://localhost:8080`. For a production build:
+
+```bash
+cargo build --release
+./target/release/backend
+```
+
+In a separate terminal, start the frontend:
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Open `http://localhost:3000` in your browser. To build for production:
+
+```bash
+npm run build
+```
+
+## Authors
+
+| Name | NIM |
 |---|---|
-| Fahd Muhammad Zahid| 13524078 |
+| Fahd Muhammad Zahid | 13524078 |
 | Daniel Anindito Nugroho | 13524002 |
 | Timothy Bernard Soeharto | 13524092 |

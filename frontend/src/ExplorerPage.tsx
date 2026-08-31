@@ -156,7 +156,7 @@ export default function ExplorerPage() {
     if (playbackStep < searchResult.traversal_log.length) {
       const timer = setTimeout(() => {
         setPlaybackStep(prev => prev + 1);
-      }, 1000); // 1000ms (1 detik) per iterasi agar alur lebih mudah diikuti
+      }, 1); // 1000ms (1 detik) per iterasi agar alur lebih mudah diikuti
       return () => clearTimeout(timer);
     }
   }, [searchResult, playbackStep, isVisualizing]);

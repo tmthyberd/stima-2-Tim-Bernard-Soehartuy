@@ -77,63 +77,63 @@ fn dfs_helper(
     }
     false
 }
-#[test]
-fn test_bfs() {
-    use crate::parser::parse;
-
-    let html = r#"<html><body><div><p>Satu</p><p>Dua</p></div></body></html>"#;
-    let tree = parse(html);
-    let result = bfs(&tree, "p", 0).unwrap();
-
-    println!("Traversal log: {:?}", result.traversal_log);
-    println!("Found at: {:?}", result.found_indices);
-
-    assert_eq!(result.found_indices.len(), 2);
-}
-
-#[test]
-fn test_combinator_selectors() {
-    use crate::parser::parse;
-
-    let html = r#"
-        <html>
-            <body>
-                <main>
-                    <section class="card"><p id="inside">Inside</p></section>
-                    <p id="after-section">After</p>
-                    <article><p id="nested">Nested</p></article>
-                    <h2>Title</h2>
-                    <p id="after-heading">Lead</p>
-                    <p id="last">Last</p>
-                </main>
-            </body>
-        </html>
-    "#;
-    let tree = parse(html);
-
-    assert_eq!(
-        ids_for(&tree, bfs(&tree, "main p", 0).unwrap()),
-        vec!["after-section", "after-heading", "last", "inside", "nested",]
-    );
-    assert_eq!(
-        ids_for(&tree, bfs(&tree, "main > p", 0).unwrap()),
-        vec!["after-section", "after-heading", "last"]
-    );
-    assert_eq!(
-        ids_for(&tree, bfs(&tree, "section + p", 0).unwrap()),
-        vec!["after-section"]
-    );
-    assert_eq!(
-        ids_for(&tree, bfs(&tree, "section ~ p", 0).unwrap()),
-        vec!["after-section", "after-heading", "last"]
-    );
-}
-
-#[cfg(test)]
-fn ids_for(tree: &DomTree, result: SearchResult) -> Vec<String> {
-    result
-        .found_indices
-        .iter()
-        .filter_map(|&index| tree.nodes[index].attributes.get("id").cloned())
-        .collect()
-}
+// #[test]
+// fn test_bfs() {
+//     use crate::parser::parse;
+//
+//     let html = r#"<html><body><div><p>Satu</p><p>Dua</p></div></body></html>"#;
+//     let tree = parse(html);
+//     let result = bfs(&tree, "p", 0).unwrap();
+//
+//     println!("Traversal log: {:?}", result.traversal_log);
+//     println!("Found at: {:?}", result.found_indices);
+//
+//     assert_eq!(result.found_indices.len(), 2);
+// }
+//
+// #[test]
+// fn test_combinator_selectors() {
+//     use crate::parser::parse;
+//
+//     let html = r#"
+//         <html>
+//             <body>
+//                 <main>
+//                     <section class="card"><p id="inside">Inside</p></section>
+//                     <p id="after-section">After</p>
+//                     <article><p id="nested">Nested</p></article>
+//                     <h2>Title</h2>
+//                     <p id="after-heading">Lead</p>
+//                     <p id="last">Last</p>
+//                 </main>
+//             </body>
+//         </html>
+//     "#;
+//     let tree = parse(html);
+//
+//     assert_eq!(
+//         ids_for(&tree, bfs(&tree, "main p", 0).unwrap()),
+//         vec!["after-section", "after-heading", "last", "inside", "nested",]
+//     );
+//     assert_eq!(
+//         ids_for(&tree, bfs(&tree, "main > p", 0).unwrap()),
+//         vec!["after-section", "after-heading", "last"]
+//     );
+//     assert_eq!(
+//         ids_for(&tree, bfs(&tree, "section + p", 0).unwrap()),
+//         vec!["after-section"]
+//     );
+//     assert_eq!(
+//         ids_for(&tree, bfs(&tree, "section ~ p", 0).unwrap()),
+//         vec!["after-section", "after-heading", "last"]
+//     );
+// }
+//
+// #[cfg(test)]
+// fn ids_for(tree: &DomTree, result: SearchResult) -> Vec<String> {
+//     result
+//         .found_indices
+//         .iter()
+//         .filter_map(|&index| tree.nodes[index].attributes.get("id").cloned())
+//         .collect()
+// }

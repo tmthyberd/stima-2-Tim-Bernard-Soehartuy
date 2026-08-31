@@ -15,7 +15,7 @@ pub struct DomNode {
     pub parent: Option<usize>,
     pub text_content: Option<String>,
 }
-#[derive(Debug, Serialize)]
+#[derive(Serialize)]
 pub struct DomTree {
     pub nodes: Vec<DomNode>,
 }
